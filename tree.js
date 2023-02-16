@@ -84,7 +84,9 @@ export default class Tree {
   }
 
   levelOrder(callback, tempRoot = this.root) {
+    const tempQueue = [];
     const queue = [];
+
     queue.push(tempRoot);
 
     while (queue.length) {
@@ -92,7 +94,7 @@ export default class Tree {
       const temp = queue.shift();
 
       // Execute callback
-      callback(temp);
+      callback ? callback(temp) : tempQueue.push(temp.value);
 
       // Enqueue left child
       if (temp.leftNode != null) {
@@ -104,6 +106,8 @@ export default class Tree {
         queue.push(temp.rightNode);
       }
     }
+
+    if (!callback) return tempQueue;
   }
 
   height(tempRoot = this.root) {
@@ -115,6 +119,59 @@ export default class Tree {
 
       return leftHeight > rightHeight ? ++leftHeight : ++rightHeight;
     }
+  }
+
+  depth(key, tempRoot = this.root, depth = 0) {
+    let depthVal = depth;
+
+    if (tempRoot.value === key || tempRoot === null) return depthVal;
+    else if (key < tempRoot.value)
+      return this.depth(key, tempRoot.leftNode, ++depthVal);
+    else if (key > tempRoot.value)
+      return this.depth(key, tempRoot.rightNode, ++depthVal);
+  }
+
+  // Recursive traversal methods
+
+  // left root right
+  inorder(tempRoot = this.root, arr = [], callback) {
+    let array = arr;
+
+    if (tempRoot !== null) {
+      this.inorder(tempRoot.leftNode, array, callback);
+      callback ? callback(tempRoot.value) : array.push(tempRoot.value);
+      this.inorder(tempRoot.rightNode, array, callback);
+    }
+
+    if (!callback) return array;
+  }
+
+  // root left right
+  preorder(tempRoot = this.root, arr = [], callback) {
+    let array = arr;
+
+    if (tempRoot !== null) {
+      callback ? callback(tempRoot.value) : array.push(tempRoot.value);
+
+      this.preorder(tempRoot.leftNode, array, callback);
+      this.preorder(tempRoot.rightNode, array, callback);
+    }
+
+    if (!callback) return array;
+  }
+
+  //  left right root
+  postorder(tempRoot = this.root, arr = [], callback) {
+    let array = arr;
+
+    if (tempRoot !== null) {
+      this.postorder(tempRoot.leftNode, array, callback);
+      this.postorder(tempRoot.rightNode, array, callback);
+
+      callback ? callback(tempRoot.value) : array.push(tempRoot.value);
+    }
+
+    if (!callback) return array;
   }
 
   cleanArray(array) {
@@ -175,8 +232,8 @@ one.insert(3.5);
 one.insert(1);
 prettyPrint(one.root);
 
-one.delete(2);
-prettyPrint(one.root);
+// one.delete(2);
+// prettyPrint(one.root);
 
 // const two = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 // prettyPrint(two.root);

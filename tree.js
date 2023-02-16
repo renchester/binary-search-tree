@@ -83,6 +83,40 @@ export default class Tree {
     else if (key > tempRoot.value) return this.find(key, tempRoot.rightNode);
   }
 
+  levelOrder(callback, tempRoot = this.root) {
+    const queue = [];
+    queue.push(tempRoot);
+
+    while (queue.length) {
+      // Get first item and dequeue that item
+      const temp = queue.shift();
+
+      // Execute callback
+      callback(temp);
+
+      // Enqueue left child
+      if (temp.leftNode != null) {
+        queue.push(temp.leftNode);
+      }
+
+      // Enqueue right child
+      if (temp.rightNode != null) {
+        queue.push(temp.rightNode);
+      }
+    }
+  }
+
+  height(tempRoot = this.root) {
+    if (tempRoot === null) {
+      return 0;
+    } else {
+      let leftHeight = this.height(tempRoot.leftNode);
+      let rightHeight = this.height(tempRoot.rightNode);
+
+      return leftHeight > rightHeight ? ++leftHeight : ++rightHeight;
+    }
+  }
+
   cleanArray(array) {
     // Removes duplicates in array
     return [...new Set(array)];

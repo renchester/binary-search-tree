@@ -35,19 +35,15 @@ export default class Tree {
     return tempRoot;
   }
 
-  delete(key) {
-    this.root = this.deleteRecursive(key);
-  }
-
-  deleteRecursive(key, tempRoot = this.root) {
+  delete(key, tempRoot = this.root) {
     if (tempRoot === null) {
       return tempRoot;
     }
 
     if (key < tempRoot.value) {
-      tempRoot.leftNode = this.deleteRecursive(key, tempRoot.leftNode);
+      tempRoot.leftNode = this.delete(key, tempRoot.leftNode);
     } else if (key > tempRoot.value) {
-      tempRoot.rightNode = this.deleteRecursive(key, tempRoot.rightNode);
+      tempRoot.rightNode = this.delete(key, tempRoot.rightNode);
     } else {
       // if key is same as the node, this node is to be deleted
 
@@ -62,10 +58,7 @@ export default class Tree {
       tempRoot.value = this.minValue(tempRoot.rightNode);
 
       // Delete the inorder successor
-      tempRoot.rightNode = this.deleteRecursive(
-        tempRoot.value,
-        tempRoot.rightNode,
-      );
+      tempRoot.rightNode = this.delete(tempRoot.value, tempRoot.rightNode);
     }
 
     return tempRoot;

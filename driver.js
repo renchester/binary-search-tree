@@ -1,4 +1,8 @@
-import Tree from './tree';
+/* eslint-disable import/extensions */
+/* eslint-disable no-console */
+import Tree from './tree.js';
+
+// HELPER FUNCTIONS
 
 const prettyPrint = (node, prefix = '', isLeft = true) => {
   if (node.rightNode !== null) {
@@ -10,24 +14,29 @@ const prettyPrint = (node, prefix = '', isLeft = true) => {
   }
 };
 
-const one = new Tree([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-one.insert(3.5);
-one.insert(1);
-one.insert(3.75);
-one.insert(3.8);
-one.insert(3.9);
+const randomArray = (length, max) =>
+  [...new Array(length)].map(() => Math.round(Math.random() * max));
 
-one.rebalanceTree();
-prettyPrint(one.root);
+//  DRIVERS
 
-// one.delete(2);
-// prettyPrint(one.root);
+const tester = new Tree(randomArray(30, 1000));
+prettyPrint(tester.root);
 
-// const two = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-// prettyPrint(two.root);
+console.log(tester.isBalanced());
+console.log(tester.preorder());
+console.log(tester.inorder());
+console.log(tester.postorder());
 
-// const four = new Tree([0, 1, 2, 3, 4, 5, 6, 7]);
-// prettyPrint(four.root);
+for (let i = 0; i <= 50; i++) {
+  tester.insert(Math.ceil(Math.random() * 1000));
+}
 
-// const three = new Tree([0, 0, 0, 1, 2, 3, 4, 4, 4, 5, 6, 7, 8, 8, 9]);
-// prettyPrint(three.root);
+prettyPrint(tester.root);
+
+console.log(tester.isBalanced());
+tester.rebalanceTree();
+
+console.log(tester.isBalanced());
+console.log(tester.preorder());
+console.log(tester.inorder());
+console.log(tester.postorder());

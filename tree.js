@@ -75,6 +75,14 @@ export default class Tree {
     return minVal;
   }
 
+  find(key, tempRoot = this.root) {
+    if (tempRoot === null) return tempRoot;
+
+    if (key === tempRoot.value) return tempRoot;
+    else if (key < tempRoot.value) return this.find(key, tempRoot.leftNode);
+    else if (key > tempRoot.value) return this.find(key, tempRoot.rightNode);
+  }
+
   cleanArray(array) {
     // Removes duplicates in array
     return [...new Set(array)];

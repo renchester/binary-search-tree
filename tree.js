@@ -134,44 +134,59 @@ export default class Tree {
   // Recursive traversal methods
 
   // left root right
-  inorder(tempRoot = this.root, arr = [], callback) {
+  inorder(callback, tempRoot = this.root, arr = []) {
     let array = arr;
 
     if (tempRoot !== null) {
-      this.inorder(tempRoot.leftNode, array, callback);
+      this.inorder(callback, tempRoot.leftNode, array);
       callback ? callback(tempRoot.value) : array.push(tempRoot.value);
-      this.inorder(tempRoot.rightNode, array, callback);
+      this.inorder(callback, tempRoot.rightNode, array);
     }
 
     if (!callback) return array;
   }
 
   // root left right
-  preorder(tempRoot = this.root, arr = [], callback) {
+  preorder(callback, tempRoot = this.root, arr = []) {
     let array = arr;
 
     if (tempRoot !== null) {
       callback ? callback(tempRoot.value) : array.push(tempRoot.value);
 
-      this.preorder(tempRoot.leftNode, array, callback);
-      this.preorder(tempRoot.rightNode, array, callback);
+      this.preorder(callback, tempRoot.leftNode, array);
+      this.preorder(callback, tempRoot.rightNode, array);
     }
 
     if (!callback) return array;
   }
 
   //  left right root
-  postorder(tempRoot = this.root, arr = [], callback) {
+  postorder(callback, tempRoot = this.root, arr = []) {
     let array = arr;
 
     if (tempRoot !== null) {
-      this.postorder(tempRoot.leftNode, array, callback);
-      this.postorder(tempRoot.rightNode, array, callback);
+      this.postorder(callback, tempRoot.leftNode, array);
+      this.postorder(callback, tempRoot.rightNode, array);
 
       callback ? callback(tempRoot.value) : array.push(tempRoot.value);
     }
 
     if (!callback) return array;
+  }
+
+  isBalanced(tempRoot = this.root) {
+    if (tempRoot === null) return true;
+
+    let leftHeight = this.height(this.root.leftNode);
+    let rightHeight = this.height(this.root.rightNode);
+
+    if (
+      Math.abs(leftHeight - rightHeight) <= 1 &&
+      this.isBalanced(this.root.leftNode) &&
+      this.isBalanced(this.root.rightNode)
+    )
+      return true;
+    else return false;
   }
 
   cleanArray(array) {
@@ -230,6 +245,12 @@ const prettyPrint = (node, prefix = '', isLeft = true) => {
 const one = new Tree([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 one.insert(3.5);
 one.insert(1);
+one.insert(3.75);
+one.insert(3.8);
+one.insert(3.9);
+
+// one.isBalanced();
+console.log(one.isBalanced());
 prettyPrint(one.root);
 
 // one.delete(2);

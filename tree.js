@@ -265,13 +265,13 @@ export default class Tree {
   isBalanced(tempRoot = this.root) {
     if (tempRoot === null) return true;
 
-    const leftHeight = this.height(this.root.leftNode);
-    const rightHeight = this.height(this.root.rightNode);
+    const leftHeight = this.height(tempRoot.leftNode);
+    const rightHeight = this.height(tempRoot.rightNode);
 
     if (
       Math.abs(leftHeight - rightHeight) <= 1 &&
-      this.isBalanced(this.root.leftNode) &&
-      this.isBalanced(this.root.rightNode)
+      this.isBalanced(tempRoot.leftNode) &&
+      this.isBalanced(tempRoot.rightNode)
     )
       return true;
 

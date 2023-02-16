@@ -2,11 +2,34 @@ import TreeNode from './node.js';
 
 export default class Tree {
   constructor(array) {
-    const sortedArray = this.mergeSort(array);
-    const cleanedArray = this.cleanArray(sortedArray);
+    const cleanArray = [...new Set(array.sort((a, b) => a - b))];
 
-    this.root = this.buildTree(cleanedArray, 0, cleanedArray.length - 1);
+    this.root = this.buildTree(cleanArray, 0, cleanArray.length - 1);
   }
+
+  /**
+   *
+   * @param {Object} tempRoot
+   * @returns the minimum value of the node branch
+   */
+  static #minValue(tempRoot) {
+    let minVal = tempRoot.value;
+
+    while (tempRoot.leftNode !== null) {
+      minVal = tempRoot.leftNode.value;
+      tempRoot = tempRoot.leftNode;
+    }
+
+    return minVal;
+  }
+
+  /**
+   *
+   * @param {Array} Takes an array of data and turns it into a balanced binary tree
+   * full of sorted Node objects, with duplicates removed.
+   *
+   * @returns the level-0 root node of the binary tree
+   */
 
   buildTree(array) {
     if (array.length < 1) return null;
@@ -19,6 +42,16 @@ export default class Tree {
 
     return root;
   }
+
+  /**
+   *
+   * Inserts a value dynamically into the binary tree--the placement of which is
+   * determined on the value of the key
+   *
+   * @param {*} key
+   * @param {Object} tempRoot
+   * @returns the tempRoot node
+   */
 
   insert(key, tempRoot = this.root) {
     if (tempRoot === null) {
@@ -35,6 +68,17 @@ export default class Tree {
     return tempRoot;
   }
 
+  /**
+   *
+   * Deletes a node in the binary tree. If the target node has a singular child,
+   * the child takes the place of the node. If the target has two children, then the
+   * inorder successor(smallest value in the right subtree) takes the place of the node.
+   *
+   * @param {*} key
+   * @param {Object} tempRoot
+   * @returns the tempRoot node
+   */
+
   delete(key, tempRoot = this.root) {
     if (tempRoot === null) {
       return tempRoot;
@@ -48,14 +92,11 @@ export default class Tree {
       // if key is same as the node, this node is to be deleted
 
       // if node has one or no child
-      if (tempRoot.leftNode === null) {
-        return tempRoot.rightNode;
-      } else if (tempRoot.rightNode === null) {
-        return tempRoot.leftNode;
-      }
+      if (tempRoot.leftNode === null) return tempRoot.rightNode;
+      if (tempRoot.rightNode === null) return tempRoot.leftNode;
 
       // if node has two or more children: get inorder successor which is smallest in right subtree
-      tempRoot.value = this.minValue(tempRoot.rightNode);
+      tempRoot.value = this.#minValue(tempRoot.rightNode);
 
       // Delete the inorder successor
       tempRoot.rightNode = this.delete(tempRoot.value, tempRoot.rightNode);
@@ -64,24 +105,30 @@ export default class Tree {
     return tempRoot;
   }
 
-  minValue(tempRoot) {
-    let minVal = tempRoot.value;
-
-    while (tempRoot.leftNode !== null) {
-      minVal = tempRoot.leftNode.value;
-      tempRoot = temp.rightNodeRoot.leftNode;
-    }
-
-    return minVal;
-  }
+  /**
+   *
+   * @param {*} key
+   * @param {Object} tempRoot
+   * @returns the node matching the value of the given key
+   */
 
   find(key, tempRoot = this.root) {
     if (tempRoot === null) return tempRoot;
 
     if (key === tempRoot.value) return tempRoot;
-    else if (key < tempRoot.value) return this.find(key, tempRoot.leftNode);
-    else if (key > tempRoot.value) return this.find(key, tempRoot.rightNode);
+    if (key < tempRoot.value) return this.find(key, tempRoot.leftNode);
+    if (key > tempRoot.value) return this.find(key, tempRoot.rightNode);
   }
+
+  /**
+   *
+   * Traverses the tree in breadth-first level order and provide each node as the
+   * argument to the provided callback function. Implemented using a queue structure
+   *
+   * @param {function} callback. To be executed in the iteration
+   * @param {object} tempRoot
+   * @returns an array of values iterated if callback is not given
+   */
 
   levelOrder(callback, tempRoot = this.root) {
     const tempQueue = [];
@@ -110,32 +157,63 @@ export default class Tree {
     if (!callback) return tempQueue;
   }
 
+  /**
+   *
+   * Accepts a node and returns its height. Height is defined as the number
+   * of edges in longest path from a given node to a leaf node.
+   *
+   * @param {object} tempRoot
+   * @returns the height value of the binary tree
+   */
+
   height(tempRoot = this.root) {
     if (tempRoot === null) {
       return 0;
-    } else {
-      let leftHeight = this.height(tempRoot.leftNode);
-      let rightHeight = this.height(tempRoot.rightNode);
-
-      return leftHeight > rightHeight ? ++leftHeight : ++rightHeight;
     }
+    let leftHeight = this.height(tempRoot.leftNode);
+    let rightHeight = this.height(tempRoot.rightNode);
+
+    return leftHeight > rightHeight ? ++leftHeight : ++rightHeight;
   }
+
+  /**
+   *
+   * Accepts a node and returns its depth. Depth is defined as the number
+   * of edges in path from a given node to the tree’s root node.
+   *
+   * @param {*} key
+   * @param {object} tempRoot
+   * @param {number} depth
+   * @returns the depth value of the node given
+   */
 
   depth(key, tempRoot = this.root, depth = 0) {
     let depthVal = depth;
 
     if (tempRoot.value === key || tempRoot === null) return depthVal;
-    else if (key < tempRoot.value)
+    if (key < tempRoot.value)
       return this.depth(key, tempRoot.leftNode, ++depthVal);
-    else if (key > tempRoot.value)
+    if (key > tempRoot.value)
       return this.depth(key, tempRoot.rightNode, ++depthVal);
   }
 
   // Recursive traversal methods
 
-  // left root right
+  /**
+   *
+   * These traversal methods accept a function parameter with each of these
+   * functions traversing the tree in their respective depth-first order and
+   * yield each node to the provided function given as an argument.
+   *
+   * @param {function} callback
+   * @param {object} tempRoot
+   * @param {*} arr. Placeholder for an array to be returned if callback is not given
+   * @returns an array of iterated values if callback is not given
+   */
+
+  // left -> root -> right
   inorder(callback, tempRoot = this.root, arr = []) {
-    let array = arr;
+    const array = arr;
 
     if (tempRoot !== null) {
       this.inorder(callback, tempRoot.leftNode, array);
@@ -146,9 +224,9 @@ export default class Tree {
     if (!callback) return array;
   }
 
-  // root left right
+  // root -> left -> right
   preorder(callback, tempRoot = this.root, arr = []) {
-    let array = arr;
+    const array = arr;
 
     if (tempRoot !== null) {
       callback ? callback(tempRoot.value) : array.push(tempRoot.value);
@@ -160,9 +238,9 @@ export default class Tree {
     if (!callback) return array;
   }
 
-  //  left right root
+  //  left -> right -> root
   postorder(callback, tempRoot = this.root, arr = []) {
-    let array = arr;
+    const array = arr;
 
     if (tempRoot !== null) {
       this.postorder(callback, tempRoot.leftNode, array);
@@ -174,11 +252,21 @@ export default class Tree {
     if (!callback) return array;
   }
 
+  /**
+   *
+   * Checks if the tree is balanced. A balanced tree is one where the
+   * difference between heights of left subtree and right subtree of
+   * every node is not more than 1.
+   *
+   * @param {object} tempRoot
+   * @returns a Boolean that describes if the tree is balanced
+   */
+
   isBalanced(tempRoot = this.root) {
     if (tempRoot === null) return true;
 
-    let leftHeight = this.height(this.root.leftNode);
-    let rightHeight = this.height(this.root.rightNode);
+    const leftHeight = this.height(this.root.leftNode);
+    const rightHeight = this.height(this.root.rightNode);
 
     if (
       Math.abs(leftHeight - rightHeight) <= 1 &&
@@ -186,93 +274,15 @@ export default class Tree {
       this.isBalanced(this.root.rightNode)
     )
       return true;
-    else return false;
+
+    return false;
   }
 
-  cleanArray(array) {
-    // Removes duplicates in array
-    return [...new Set(array)];
-  }
+  /**
+   * Rebalances an unbalanced tree.
+   */
 
-  mergeSort(arr) {
-    // Guard clauses
-    if (arr.length === 0)
-      return 'Invalid input: Please provide a non-empty array';
-    if (arr.length < 2) return arr;
-
-    const halfPoint = Math.floor(arr.length / 2);
-
-    //  Separate array into left and right
-    const arr1 = this.mergeSort(arr.slice(0, halfPoint));
-    const arr2 = this.mergeSort(arr.slice(halfPoint));
-
-    return this.merge(arr1, arr2);
-  }
-
-  merge(arr1, arr2) {
-    let i = 0;
-    let j = 0;
-    let k = 0;
-
-    let arr3 = [];
-
-    while (i < arr1.length && j < arr2.length) {
-      if (arr1[i] <= arr2[j]) {
-        arr3[k++] = arr1[i++];
-      }
-      if (arr2[j] < arr1[i]) {
-        arr3[k++] = arr2[j++];
-      }
-    }
-
-    for (; i < arr1.length; i++) arr3[k++] = arr1[i];
-    for (; j < arr2.length; j++) arr3[k++] = arr2[j];
-
-    return arr3;
+  rebalanceTree() {
+    this.root = new Tree(this.inorder()).root;
   }
 }
-
-const prettyPrint = (node, prefix = '', isLeft = true) => {
-  if (node.rightNode !== null) {
-    prettyPrint(node.rightNode, `${prefix}${isLeft ? '│   ' : '    '}`, false);
-  }
-  console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.value}`);
-  if (node.leftNode !== null) {
-    prettyPrint(node.leftNode, `${prefix}${isLeft ? '    ' : '│   '}`, true);
-  }
-};
-
-const one = new Tree([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-one.insert(3.5);
-one.insert(1);
-one.insert(3.75);
-one.insert(3.8);
-one.insert(3.9);
-
-// one.isBalanced();
-console.log(one.isBalanced());
-prettyPrint(one.root);
-
-// one.delete(2);
-// prettyPrint(one.root);
-
-// const two = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-// prettyPrint(two.root);
-
-// const four = new Tree([0, 1, 2, 3, 4, 5, 6, 7]);
-// prettyPrint(four.root);
-
-// const three = new Tree([0, 0, 0, 1, 2, 3, 4, 4, 4, 5, 6, 7, 8, 8, 9]);
-// prettyPrint(three.root);
-
-//   buildTree(array, start, end) {
-//     if (start > end) return null;
-
-//     const halfPoint = Math.floor((+start + +end) / 2);
-//     const root = new TreeNode(array[halfPoint]);
-
-//     root.leftNode = this.buildTree(array, start, halfPoint - 1);
-//     root.rightNode = this.buildTree(array, halfPoint + 1, end);
-
-//     return root;
-//   }
